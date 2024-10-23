@@ -6,7 +6,7 @@ const WebSocket = require('ws');
 const chokidar = require('chokidar');
 
 const app = express();
-const PORT = 5000;
+const PORT = 5001;
 
 // 啟用 CORS
 app.use(cors());
