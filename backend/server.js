@@ -25,10 +25,11 @@ function readLogFiles(dir) {
 
   const files = findLogFiles(dir);
   files.forEach(file => {
-    // log的上一層資料夾名稱即為tactics名稱
-    const tacticsName = path.basename(path.dirname(file));
-    // log檔案名稱即為techniques名稱
+    // log的上上一層資料夾名稱即為tactics名稱
+    const tacticsName = path.basename(path.dirname(path.dirname(file)));
+    // log上一層資料夾名稱即為techniques名稱
     const techniquesName = path.basename(file).split('.')[0];
+    // log內容為偵測到的時間點
     const logContent = fs.readFileSync(file, 'utf-8').split('\n').filter(line => line.trim() !== '');
 
     // 將每一行的內容添加到 logs 並附加文件路徑
