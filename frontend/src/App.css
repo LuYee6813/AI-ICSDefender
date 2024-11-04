@@ -1,3 +1,5 @@
+/* App.css */
+
 body {
   margin: 0;
   font-family: 'Arial', sans-serif;
@@ -42,8 +44,9 @@ body {
   flex-grow: 1;
 }
 
+/* 移除固定寬度，改用 flex 屬性分配比例 */
 .sidebar {
-  width: 30%;
+  flex: 3; /* 佔 3 單位 */
   background-color: #ffffff;
   border-right: 1px solid #dfe6e9;
   padding: 20px;
@@ -52,15 +55,12 @@ body {
 }
 
 .chart-section {
-  width: 70%;
+  flex: 7; /* 佔 7 單位 */
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  /* justify-content: center; */
   padding: 20px;
-}
-
-.chart-section {
   height: 50vh; /* 全螢幕一半的高度 */
 }
 
@@ -149,4 +149,169 @@ body {
   background-color: #3b3b3b;
   color: #ecf0f1;
 }
+
+/* AttackMatrix.css */
+
+.matrix-section {
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.matrix-section h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.matrix-container {
+  display: flex;
+  gap: 5px; /* 間距使得各個策略列有微小分隔 */
+}
+
+/* 手機裝置調整 */
+@media (max-width: 768px) {
+  .matrix-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .tactic-column {
+    min-width: 100%;
+  }
+}
+
+.tactic-column {
+  min-width: 160px;
+  background-color: #ffffff;
+  border: 1px solid #dcdcdc;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.tactic-column h3 {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #1a73e8;
+  padding: 8px;
+  margin: 0;
+  background-color: #e6f2ff;
+  text-align: center;
+  border-bottom: 1px solid #dcdcdc;
+}
+
+.tactic-column p {
+  font-size: 0.85rem;
+  color: #666;
+  text-align: center;
+  padding: 5px;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #dcdcdc;
+  margin: 0;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.technique-item {
+  font-size: 0.9rem;
+  color: #333;
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #dcdcdc;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.technique-item:last-child {
+  border-bottom: none;
+}
+
+.technique-item.highlighted {
+  background-color: #f39c12;
+  color: #ffffff;
+}
+
+
+/* 響應式設計 */
+
+/* 平板裝置（寬度介於 768px 和 1024px） */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .sidebar {
+    flex: 2; /* 調整比例，例如 2:8 */
+  }
+
+  .chart-section {
+    flex: 8;
+    height: 60vh;
+  }
+
+  .alert-title {
+    font-size: 1em;
+  }
+
+  .alert-technique {
+    font-size: 0.9em;
+  }
+
+  .alert-content {
+    font-size: 0.9em;
+  }
+}
+
+/* 手機裝置（寬度小於 768px） */
+@media (max-width: 768px) {
+  .content {
+    flex-direction: column;
+  }
+
+  .sidebar, .chart-section {
+    flex: none;
+    width: 100%;
+    height: auto;
+  }
+
+  .sidebar {
+    border-right: none;
+    border-bottom: 1px solid #dfe6e9;
+  }
+
+  .chart-section {
+    height: auto;
+  }
+
+  .chart-section h2 {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+  }
+
+  .alert-title {
+    font-size: 1em;
+  }
+
+  .alert-technique {
+    font-size: 0.9em;
+  }
+
+  .alert-content {
+    font-size: 0.9em;
+  }
+
+  .matrix-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .tactic-column {
+    min-width: 100%;
+  }
+}
+
 

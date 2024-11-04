@@ -1,7 +1,6 @@
 // App.js
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import './AttackMatrix.css';
 import {
   FaBug,
   FaNetworkWired,
@@ -136,7 +135,7 @@ function App() {
           )}
         </div>
 
-        <div className="chart-matrix-section">
+        <div className="chart-section">
           <AttackMatrix highlightedTechniques={highlightedTechniques} />
           {/* <AttackAnalysis attackCounts={attackCounts} /> */}
         </div>

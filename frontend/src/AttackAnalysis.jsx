@@ -1,6 +1,5 @@
 // AttackAnalysis.js
 import React from 'react';
-import './AttackAnalysis.css'; // 引入分離的 CSS 文件
 import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
