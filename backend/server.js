@@ -1,3 +1,4 @@
+// server.js
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
@@ -72,8 +73,19 @@ function findLogFiles(dir) {
 // 創建 WebSocket 伺服器
 const wss = new WebSocket.Server({ port: 8080 });
 
+// 用於跟踪每個文件的最後讀取行數
+const fileReadPositions = {};
+
 wss.on('connection', (ws) => {
   console.log('Client connected to WebSocket');
+
+  // 初始化每個文件的讀取位置
+  const logDir = path.join(__dirname, 'data');
+  const files = findLogFiles(logDir);
+  files.forEach(file => {
+    const lineCount = fs.readFileSync(file, 'utf-8').split('\n').filter(line => line.trim() !== '').length;
+    fileReadPositions[file] = lineCount;
+  });
 
   // 使用 chokidar 監控 data 資料夾及其子資料夾
   const watcher = chokidar.watch(path.join(__dirname, 'data'), {
@@ -83,7 +95,7 @@ wss.on('connection', (ws) => {
   });
 
   // 監控文件的新增、變更和刪除
-  watcher.on('add', filePath => handleFileChange(ws, 'add', filePath));
+  watcher.on('add', filePath => handleFileAdd(ws, 'add', filePath));
   watcher.on('change', filePath => handleFileChange(ws, 'change', filePath));
   watcher.on('unlink', filePath => handleFileChange(ws, 'unlink', filePath));
 
@@ -93,17 +105,57 @@ wss.on('connection', (ws) => {
   });
 });
 
-// 處理文件變化
+// 處理文件新增
+function handleFileAdd(ws, eventType, filePath) {
+  if (eventType === 'add') {
+    // 初始化文件的讀取位置
+    const lineCount = fs.readFileSync(filePath, 'utf-8').split('\n').filter(line => line.trim() !== '').length;
+    fileReadPositions[filePath] = lineCount;
+    // 可以選擇不發送任何警報，因為文件是新添加的
+  }
+}
+
+// 處理文件變更或刪除
 function handleFileChange(ws, eventType, filePath) {
-  const logDir = path.join(__dirname, 'data');
   if (eventType === 'unlink') {
     // 發送刪除事件給前端
     ws.send(JSON.stringify({ eventType: 'delete', filePath }));
-  } else {
-    const logs = readLogFiles(logDir);
-    // 發送新增或變更的日誌內容給前端
-    ws.send(JSON.stringify({ eventType: 'update', logs }));
+    // 移除跟踪的文件
+    delete fileReadPositions[filePath];
+  } else if (eventType === 'change') {
+    // 讀取新增的日誌行
+    const newLogs = readNewLogs(filePath);
+    if (newLogs.length > 0) {
+      // 發送新增的日誌內容給前端
+      ws.send(JSON.stringify({ eventType: 'update', logs: newLogs }));
+    }
   }
+}
+
+// 讀取新增的日誌行
+function readNewLogs(filePath) {
+  let logs = [];
+  try {
+    const tacticsName = path.basename(path.dirname(path.dirname(filePath)));
+    const techniquesName = path.basename(filePath).split('.')[0];
+    const fileContent = fs.readFileSync(filePath, 'utf-8').split('\n').filter(line => line.trim() !== '');
+
+    const lastReadPosition = fileReadPositions[filePath] || 0;
+    const newLines = fileContent.slice(lastReadPosition);
+    fileReadPositions[filePath] = fileContent.length;
+
+    newLines.forEach(line => {
+      logs.push({ 
+        tacticsName: tacticsName,
+        techniquesName: techniquesName,
+        content: line,
+        filePath: filePath
+      });
+    });
+  } catch (err) {
+    console.error(`Error reading file ${filePath}:`, err);
+  }
+  return logs;
 }
 
 app.listen(PORT, () => {

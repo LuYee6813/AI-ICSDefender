@@ -1,4 +1,4 @@
-/* App.css */
+/* src/App.css */
 
 body {
   margin: 0;
@@ -61,7 +61,7 @@ body {
   align-items: center;
   /* justify-content: center; */
   padding: 20px;
-  height: 50vh; /* 全螢幕一半的高度 */
+  height: 100vh; /* 全螢幕一半的高度 */
 }
 
 .chart-section canvas {
@@ -94,8 +94,13 @@ body {
   border-radius: 5px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s;
+  opacity: 0; /* 初始透明度設為0 */
+  transform: translateX(-100%); /* 初始位置在左側 */
+}
+
+.alert-box.slide-in {
   animation: slideInFromLeft 0.5s ease-out forwards;
-  opacity: 0; /* 初始透明度設為0，動畫結束時會變為1 */
+  opacity: 1; /* 確保動畫結束時的透明度 */
 }
 
 .alert-box:hover {
@@ -187,6 +192,7 @@ body {
 }
 
 .tactic-column {
+  height: 100%;
   min-width: 160px;
   background-color: #ffffff;
   border: 1px solid #dcdcdc;
@@ -238,7 +244,6 @@ ul {
   background-color: #f39c12;
   color: #ffffff;
 }
-
 
 /* 響應式設計 */
 
@@ -313,5 +318,3 @@ ul {
     min-width: 100%;
   }
 }
-
-

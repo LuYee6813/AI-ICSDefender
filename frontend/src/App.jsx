@@ -1,16 +1,11 @@
-// App.js
+// src/App.jsx
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import {
-  FaBug,
-  FaNetworkWired,
-  FaTimesCircle,
-  FaMoon,
-  FaSun,
-} from 'react-icons/fa';
-import AttackMatrix from './AttackMatrix';
-import AttackAnalysis from './AttackAnalysis'; // 引入 AttackAnalysis 組件
-import { tactics } from './AttackData';
+import { FaMoon, FaSun } from 'react-icons/fa';
+import AttackMatrix from './components/AttackMatrix';
+import AttackAnalysis from './components/AttackAnalysis'; // 引入 AttackAnalysis 組件
+import { tactics } from './components/AttackData';
+import AlertBox from './components/AlertBox'; // 引入 AlertBox 組件
 
 function App() {
   const [logs, setLogs] = useState([]);
@@ -32,16 +27,76 @@ function App() {
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
+      console.log('Received data:', data);
 
       if (data.eventType === 'update') {
-        setLogs(data.logs);
-        updateAttackCounts(data.logs);
-        updateHighlightedTechniques(data.logs);
+        if (data.log && data.log.content && data.log.filePath) {
+          // 單個警報，檢查是否已存在，若不存在則添加
+          setLogs((prevLogs) => {
+            const exists = prevLogs.some(
+              (log) =>
+                log.filePath === data.log.filePath &&
+                log.content === data.log.content
+            );
+            if (!exists) {
+              updateAttackCounts([data.log]);
+              updateHighlightedTechniques([data.log]);
+              return [data.log, ...prevLogs];
+            }
+            return prevLogs;
+          });
+        } else if (Array.isArray(data.logs)) {
+          // 多個警報，僅添加不存在的警報
+          const validLogs = data.logs.filter(
+            (log) => log && log.content && log.filePath
+          );
+
+          setLogs((prevLogs) => {
+            const existingLogKeys = new Set(
+              prevLogs.map((log) => `${log.filePath}-${log.content}`)
+            );
+
+            const newUniqueLogs = validLogs.filter(
+              (log) => !existingLogKeys.has(`${log.filePath}-${log.content}`)
+            );
+
+            if (newUniqueLogs.length > 0) {
+              updateAttackCounts(newUniqueLogs);
+              updateHighlightedTechniques(newUniqueLogs);
+
+              // 根據時間戳排序，確保最新的在前
+              newUniqueLogs.sort((a, b) => {
+                const timeA = new Date(
+                  a.content.split('] ')[0].replace('[', '')
+                );
+                const timeB = new Date(
+                  b.content.split('] ')[0].replace('[', '')
+                );
+                return timeB - timeA;
+              });
+
+              return [...newUniqueLogs, ...prevLogs];
+            }
+
+            return prevLogs;
+          });
+        } else {
+          console.error('Invalid update data:', data);
+        }
       } else if (data.eventType === 'delete') {
-        setLogs((prevLogs) =>
-          prevLogs.filter((log) => log.filePath !== data.filePath)
-        );
+        if (data.filePath) {
+          setLogs((prevLogs) =>
+            prevLogs.filter((log) => log.filePath !== data.filePath)
+          );
+          // 可選：根據需要更新攻擊計數和高亮技術
+        } else {
+          console.error('Invalid delete data:', data);
+        }
       }
+    };
+
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
     };
 
     ws.onclose = () => {
@@ -72,12 +127,24 @@ function App() {
         newCounts['Automated Collection']++;
       if (log.content.includes('Spoof Reporting Message'))
         newCounts['Spoof Reporting Message']++;
-      if (log.content.includes('Brute Force IO')) newCounts['Brute Force IO']++;
+      if (log.content.includes('Brute Force IO'))
+        newCounts['Brute Force IO']++;
       if (log.content.includes('Denial of Service'))
         newCounts['Denial of Service']++;
     });
 
-    setAttackCounts(newCounts);
+    setAttackCounts((prevCounts) => ({
+      'Automated Collection':
+        prevCounts['Automated Collection'] +
+        newCounts['Automated Collection'],
+      'Spoof Reporting Message':
+        prevCounts['Spoof Reporting Message'] +
+        newCounts['Spoof Reporting Message'],
+      'Brute Force IO':
+        prevCounts['Brute Force IO'] + newCounts['Brute Force IO'],
+      'Denial of Service':
+        prevCounts['Denial of Service'] + newCounts['Denial of Service'],
+    }));
   };
 
   // 更新高亮技術
@@ -98,6 +165,12 @@ function App() {
     setHighlightedTechniques(uniqueTechniques);
   };
 
+  // 移除特定的 log
+  const removeLog = (filePath) => {
+    setLogs((prevLogs) => prevLogs.filter((log) => log.filePath !== filePath));
+    // 可選：根據需要更新攻擊計數和高亮技術
+  };
+
   return (
     <div className={`dashboard ${isDarkMode ? 'dark' : 'light'}`}>
       <nav className="navbar">
@@ -111,24 +184,12 @@ function App() {
         <div className="sidebar">
           <h2>Real-time Alerts</h2>
           {logs.length > 0 ? (
-            logs.map((log, index) => (
-              <div
-                key={index}
-                className="alert-box"
-                style={{ animationDelay: `${index * 0.2}s` }}
-              >
-                <div className="alert-header">
-                  <FaNetworkWired className="alert-icon" />
-                  <h3 className="alert-title">
-                    ATT&CK Tactic: {log.tacticsName}
-                  </h3>
-                  <FaTimesCircle className="close-icon" title="Remove Log" />
-                </div>
-                <p className="alert-technique">
-                  <FaBug /> Technique: {log.techniquesName}
-                </p>
-                <p className="alert-content">{log.content}</p>
-              </div>
+            logs.map((log) => (
+              <AlertBox
+                key={`${log.filePath}-${log.content}`}
+                log={log}
+                onRemove={removeLog}
+              />
             ))
           ) : (
             <p className="no-log">No log files found.</p>
