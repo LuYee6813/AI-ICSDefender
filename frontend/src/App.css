@@ -44,24 +44,23 @@ body {
   flex-grow: 1;
 }
 
-/* 移除固定寬度，改用 flex 屬性分配比例 */
 .sidebar {
-  flex: 3; /* 佔 3 單位 */
+  flex: 2; 
   background-color: #ffffff;
   border-right: 1px solid #dfe6e9;
   padding: 20px;
   overflow-y: auto;
-  transition: background-color 0.3s, color 0.3s;
 }
 
+
 .chart-section {
-  flex: 7; /* 佔 7 單位 */
+  flex: 8; 
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* justify-content: center; */
   padding: 20px;
-  height: 100vh; /* 全螢幕一半的高度 */
+  height: 100vh;
+  overflow: auto; /* 防止內容過大時溢出 */
 }
 
 .chart-section canvas {
@@ -174,10 +173,15 @@ body {
   text-align: center;
 }
 
+/* 確保 .matrix-container 滿足 flex 布局 */
 .matrix-container {
   display: flex;
-  gap: 5px; /* 間距使得各個策略列有微小分隔 */
+  gap: 5px;
+  width: 100%;
+  overflow-x: auto; /* 在容器過大時允許水平滾動 */
+  justify-content: space-between;
 }
+
 
 /* 手機裝置調整 */
 @media (max-width: 768px) {
@@ -192,12 +196,12 @@ body {
 }
 
 .tactic-column {
-  height: 100%;
-  min-width: 160px;
+  min-width: 160px; /* 設定最小寬度確保所有元素可見 */
   background-color: #ffffff;
   border: 1px solid #dcdcdc;
   border-radius: 4px;
   overflow: hidden;
+  height: 100%;
 }
 
 .tactic-column h3 {
