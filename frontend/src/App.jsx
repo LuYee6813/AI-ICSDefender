@@ -1,11 +1,11 @@
 // src/App.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import { FaMoon, FaSun } from 'react-icons/fa';
 import AttackMatrix from './components/AttackMatrix';
-import AttackAnalysis from './components/AttackAnalysis'; // 引入 AttackAnalysis 組件
+import AttackAnalysis from './components/AttackAnalysis';
 import { tactics } from './components/AttackData';
-import AlertBox from './components/AlertBox'; // 引入 AlertBox 組件
+import AlertBox from './components/AlertBox';
 
 function App() {
   const [logs, setLogs] = useState([]);
@@ -18,35 +18,37 @@ function App() {
   });
   const [highlightedTechniques, setHighlightedTechniques] = useState([]);
 
+  const wsRef = useRef(null);
+
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:8080');
+    // 從伺服器獲取現有的日誌
+    fetch('http://localhost:5001/api/logs')
+      .then((response) => response.json())
+      .then((data) => {
+        setLogs(data);
+
+        // 更新攻擊計數和高亮技術
+        updateAttackCounts(data);
+        updateHighlightedTechniques(data);
+      })
+      .catch((error) => {
+        console.error('獲取日誌時出錯：', error);
+      });
+
+    // WebSocket 連接
+    wsRef.current = new WebSocket('ws://localhost:8080');
+    const ws = wsRef.current;
 
     ws.onopen = () => {
-      console.log('Connected to WebSocket');
+      console.log('已連接到 WebSocket');
     };
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log('Received data:', data);
+      console.log('收到資料：', data);
 
       if (data.eventType === 'update') {
-        if (data.log && data.log.content && data.log.filePath) {
-          // 單個警報，檢查是否已存在，若不存在則添加
-          setLogs((prevLogs) => {
-            const exists = prevLogs.some(
-              (log) =>
-                log.filePath === data.log.filePath &&
-                log.content === data.log.content
-            );
-            if (!exists) {
-              updateAttackCounts([data.log]);
-              updateHighlightedTechniques([data.log]);
-              return [data.log, ...prevLogs];
-            }
-            return prevLogs;
-          });
-        } else if (Array.isArray(data.logs)) {
-          // 多個警報，僅添加不存在的警報
+        if (Array.isArray(data.logs)) {
           const validLogs = data.logs.filter(
             (log) => log && log.content && log.filePath
           );
@@ -57,7 +59,8 @@ function App() {
             );
 
             const newUniqueLogs = validLogs.filter(
-              (log) => !existingLogKeys.has(`${log.filePath}-${log.content}`)
+              (log) =>
+                !existingLogKeys.has(`${log.filePath}-${log.content}`)
             );
 
             if (newUniqueLogs.length > 0) {
@@ -80,27 +83,29 @@ function App() {
 
             return prevLogs;
           });
-        } else {
-          console.error('Invalid update data:', data);
         }
       } else if (data.eventType === 'delete') {
-        if (data.filePath) {
+        if (data.filePath && data.content) {
           setLogs((prevLogs) =>
-            prevLogs.filter((log) => log.filePath !== data.filePath)
+            prevLogs.filter(
+              (log) =>
+                log.filePath !== data.filePath ||
+                log.content !== data.content
+            )
           );
           // 可選：根據需要更新攻擊計數和高亮技術
         } else {
-          console.error('Invalid delete data:', data);
+          console.error('無效的刪除資料：', data);
         }
       }
     };
 
     ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
+      console.error('WebSocket 錯誤：', error);
     };
 
     ws.onclose = () => {
-      console.log('WebSocket connection closed');
+      console.log('WebSocket 連線已關閉');
     };
 
     return () => {
@@ -135,8 +140,7 @@ function App() {
 
     setAttackCounts((prevCounts) => ({
       'Automated Collection':
-        prevCounts['Automated Collection'] +
-        newCounts['Automated Collection'],
+        prevCounts['Automated Collection'] + newCounts['Automated Collection'],
       'Spoof Reporting Message':
         prevCounts['Spoof Reporting Message'] +
         newCounts['Spoof Reporting Message'],
@@ -166,15 +170,29 @@ function App() {
   };
 
   // 移除特定的 log
-  const removeLog = (filePath) => {
-    setLogs((prevLogs) => prevLogs.filter((log) => log.filePath !== filePath));
-    // 可選：根據需要更新攻擊計數和高亮技術
+  const removeLog = (log) => {
+    setLogs((prevLogs) =>
+      prevLogs.filter(
+        (l) => l.filePath !== log.filePath || l.content !== log.content
+      )
+    );
+
+    // 向後端發送刪除請求
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(
+        JSON.stringify({
+          eventType: 'deleteLogLine',
+          filePath: log.filePath,
+          content: log.content,
+        })
+      );
+    }
   };
 
   return (
     <div className={`dashboard ${isDarkMode ? 'dark' : 'light'}`}>
       <nav className="navbar">
-        <h1>ICS Defender</h1>
+        <h1>工控場域AI攻擊偵測系統</h1>
         <button className="theme-toggle" onClick={toggleTheme}>
           {isDarkMode ? <FaSun /> : <FaMoon />}
         </button>
@@ -182,7 +200,7 @@ function App() {
 
       <div className="content">
         <div className="sidebar">
-          <h2>Real-time Alerts</h2>
+          <h2>即時警報</h2>
           {logs.length > 0 ? (
             logs.map((log) => (
               <AlertBox
@@ -192,7 +210,7 @@ function App() {
               />
             ))
           ) : (
-            <p className="no-log">No log files found.</p>
+            <p className="no-log">尚未偵測到警告。</p>
           )}
         </div>
 

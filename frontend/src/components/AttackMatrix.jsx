@@ -1,6 +1,7 @@
 // AttackMatrix.js
 import React from 'react';
 import { tactics } from './AttackData';
+import './AttackMatrix.css';
 
 function AttackMatrix({ highlightedTechniques }) {
   return (

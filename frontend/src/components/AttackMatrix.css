@@ -1,0 +1,170 @@
+/* AttackMatrix.css */
+
+/* 标题样式 */
+.matrix-section h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  text-align: center;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  position: relative;
+  z-index: 1; /* 较低的层级 */
+}
+
+/* 容器样式 */
+.matrix-section {
+  max-width: 90%;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fefefe;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: visible; /* 允许子元素溢出 */
+  position: relative; /* 创建新的堆叠上下文 */
+  z-index: 1;
+}
+
+
+/* 矩阵容器 */
+.matrix-container {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: visible; /* 确保子元素的浮动效果不会被裁剪 */
+  justify-content: space-between;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+  /* 滚动条样式（保持不变） */
+  scrollbar-width: thin;
+  scrollbar-color: #007aff #e0e0e0;
+}
+
+/* 战术列样式 */
+.tactic-column {
+  flex: 1 1 150px;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  overflow: visible; /* 确保子元素的浮动效果不会被裁剪 */
+  transition: transform 0.3s, box-shadow 0.3s;
+  margin-bottom: 10px;
+  min-width: 150px;
+  height: 100%;
+  position: relative; /* 为了正确使用 z-index */
+  z-index: 3; /* 默认层级 */
+}
+
+.tactic-column:hover {
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2); /* 增加阴影 */
+  z-index: 10; /* 悬停时提升层级 */
+}
+
+/* 战术标题 */
+.tactic-column h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #007aff;
+  padding: 10px;
+  margin: 0;
+  background-color: #f0f8ff;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* 战术描述 */
+.tactic-column p {
+  font-size: 0.85rem;
+  color: #666;
+  text-align: center;
+  padding: 7px;
+  background-color: #fafafa;
+  border-bottom: 1px solid #e0e0e0;
+  margin: 0;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* 技术列表 */
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.technique-item {
+  font-size: 0.9rem;
+  color: #333;
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+  transition: background-color 0.3s, color 0.3s;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+.technique-item:last-child {
+  border-bottom: none;
+}
+
+.technique-item.highlighted {
+  background-color: #ff9500;
+  color: #ffffff;
+}
+
+/* 鼠标悬停效果 */
+.technique-item:hover {
+  background-color: #f2f2f2;
+  cursor: pointer;
+}
+
+.matrix-container::-webkit-scrollbar {
+  height: 12px;
+}
+
+.matrix-container::-webkit-scrollbar-track {
+  background: #e0e0e0;
+  border-radius: 6px;
+}
+
+.matrix-container::-webkit-scrollbar-thumb {
+  background-color: #007aff;
+  border-radius: 6px;
+  border: 3px solid #e0e0e0;
+}
+
+.matrix-container::-webkit-scrollbar-thumb:hover {
+  background-color: #005bb5;
+}
+
+/* 响应式设计 */
+
+/* 平板和桌面设备 */
+@media (min-width: 769px) {
+  .matrix-container {
+    flex-wrap: nowrap;
+  }
+}
+
+/* 移动设备 */
+@media (max-width: 768px) {
+  .matrix-section {
+    max-width: 100%;
+  }
+
+  .tactic-column {
+    flex: 1 1 100%;
+  }
+
+  .tactic-column h3 {
+    font-size: 0.95rem;
+    padding: 8px;
+  }
+
+  .tactic-column p,
+  .technique-item {
+    font-size: 0.85rem;
+    padding: 8px;
+  }
+}

@@ -1,0 +1,114 @@
+/* src/components/AlertBox.css */
+
+/* 新增滑入动画的 CSS */
+@keyframes slideInFromLeft {
+    0% {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  .alert-box {
+    margin-bottom: 10px;
+    padding: 15px;
+    border: 1px solid #dcdde1;
+    background-color: #ecf0f1;
+    border-left: 5px solid #3498db;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+    opacity: 0; /* 初始透明度设为0 */
+    transform: translateX(-100%); /* 初始位置在左侧 */
+  }
+  
+  .alert-box.slide-in {
+    animation: slideInFromLeft 0.5s ease-out forwards;
+    opacity: 1; /* 确保动画结束时的透明度 */
+  }
+  
+  .alert-box:hover {
+    transform: translateY(-3px);
+  }
+  
+  .alert-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+  }
+  
+  .alert-header-content {
+    display: flex;
+    align-items: center;
+  }
+  
+  .alert-icon {
+    margin-right: 8px;
+    color: #3498db;
+    font-size: 1.2em;
+  }
+  
+  .alert-title {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin: 0;
+  }
+  
+/* 更新关闭按钮的样式 */
+  .close-icon-wrapper {
+    display: flex;
+    align-items: center;
+  }
+  
+  .close-icon {
+    font-size: 1.2em;
+    cursor: pointer;
+    color: #888;
+  }
+  
+  .close-icon:hover {
+    color: #000;
+  }
+  
+  .alert-technique {
+    margin: 5px 0;
+    font-size: 0.95em;
+    color: #7f8c8d;
+  }
+  
+  .alert-content {
+    margin-top: 5px;
+    padding: 10px;
+    background-color: #f7f9fa;
+    border-radius: 5px;
+    font-size: 0.95em;
+    color: #34495e;
+    border: 1px solid #dcdde1;
+  }
+  
+  .no-log {
+    text-align: center;
+    font-size: 1.1em;
+    color: #7f8c8d;
+  }
+  
+  /* ZeroDay 的警报框样式 */
+  .zero-day-alert {
+    background-color: #ffcccc; /* 浅红色背景 */
+    border-left: 5px solid #ff0000; /* 红色左边框 */
+  }
+  
+  .zero-day-alert .alert-title,
+  .zero-day-alert .alert-technique,
+  .zero-day-alert .alert-content {
+    color: #a70000; /* 深红色文字 */
+  }
+  
+  .zero-day-alert .alert-icon {
+    color: #ff0000; /* 红色图标 */
+  }
+  

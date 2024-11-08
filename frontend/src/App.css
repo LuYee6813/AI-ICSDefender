@@ -45,26 +45,25 @@ body {
 }
 
 .sidebar {
-  flex: 2; 
+  flex: 2;
   background-color: #ffffff;
   border-right: 1px solid #dfe6e9;
   padding: 20px;
   overflow-y: auto;
 }
 
-
 .chart-section {
-  flex: 8; 
+  flex: 8;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 20px;
   height: 100vh;
-  overflow: auto; /* 防止內容過大時溢出 */
+  overflow: auto;
 }
 
 .chart-section canvas {
-  max-height: 100%; /* 讓圖表遵循父元素的高度 */
+  max-height: 100%;
 }
 
 .chart-section h2 {
@@ -72,216 +71,28 @@ body {
   color: #34495e;
 }
 
-/* 新增滑入動畫的 CSS */
-@keyframes slideInFromLeft {
-  0% {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-  100% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
+/* 响应式设计 */
 
-.alert-box {
-  margin-bottom: 10px;
-  padding: 15px;
-  border: 1px solid #dcdde1;
-  background-color: #ecf0f1;
-  border-left: 5px solid #3498db;
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s;
-  opacity: 0; /* 初始透明度設為0 */
-  transform: translateX(-100%); /* 初始位置在左側 */
-}
-
-.alert-box.slide-in {
-  animation: slideInFromLeft 0.5s ease-out forwards;
-  opacity: 1; /* 確保動畫結束時的透明度 */
-}
-
-.alert-box:hover {
-  transform: translateY(-3px);
-}
-
-.alert-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 5px;
-}
-
-.alert-icon {
-  margin-right: 8px;
-  color: #3498db;
-}
-
-.alert-title {
-  font-size: 1.1em;
-  font-weight: bold;
-}
-
-.alert-technique {
-  margin: 5px 0;
-  font-size: 0.95em;
-  color: #7f8c8d;
-}
-
-.alert-content {
-  margin-top: 5px;
-  padding: 10px;
-  background-color: #f7f9fa;
-  border-radius: 5px;
-  font-size: 0.95em;
-  color: #34495e;
-  border: 1px solid #dcdde1;
-}
-
-.no-log {
-  text-align: center;
-  font-size: 1.1em;
-  color: #7f8c8d;
-}
-
-.light .sidebar {
-  background-color: #ffffff;
-  color: #34495e;
-}
-
-.dark .sidebar {
-  background-color: #3b3b3b;
-  color: #ecf0f1;
-}
-
-/* AttackMatrix.css */
-
-.matrix-section {
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  max-width: 100%;
-  overflow-x: auto;
-}
-
-.matrix-section h2 {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 15px;
-  text-align: center;
-}
-
-/* 確保 .matrix-container 滿足 flex 布局 */
-.matrix-container {
-  display: flex;
-  gap: 5px;
-  width: 100%;
-  overflow-x: auto; /* 在容器過大時允許水平滾動 */
-  justify-content: space-between;
-}
-
-
-/* 手機裝置調整 */
-@media (max-width: 768px) {
-  .matrix-container {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .tactic-column {
-    min-width: 100%;
-  }
-}
-
-.tactic-column {
-  min-width: 160px; /* 設定最小寬度確保所有元素可見 */
-  background-color: #ffffff;
-  border: 1px solid #dcdcdc;
-  border-radius: 4px;
-  overflow: hidden;
-  height: 100%;
-}
-
-.tactic-column h3 {
-  font-size: 1rem;
-  font-weight: bold;
-  color: #1a73e8;
-  padding: 8px;
-  margin: 0;
-  background-color: #e6f2ff;
-  text-align: center;
-  border-bottom: 1px solid #dcdcdc;
-}
-
-.tactic-column p {
-  font-size: 0.85rem;
-  color: #666;
-  text-align: center;
-  padding: 5px;
-  background-color: #f9f9f9;
-  border-bottom: 1px solid #dcdcdc;
-  margin: 0;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-.technique-item {
-  font-size: 0.9rem;
-  color: #333;
-  padding: 10px;
-  text-align: center;
-  border-bottom: 1px solid #dcdcdc;
-  transition: background-color 0.3s, color 0.3s;
-}
-
-.technique-item:last-child {
-  border-bottom: none;
-}
-
-.technique-item.highlighted {
-  background-color: #f39c12;
-  color: #ffffff;
-}
-
-/* 響應式設計 */
-
-/* 平板裝置（寬度介於 768px 和 1024px） */
+/* 平板装置（宽度介于 768px 和 1024px） */
 @media (max-width: 1024px) and (min-width: 769px) {
   .sidebar {
-    flex: 2; /* 調整比例，例如 2:8 */
+    flex: 2;
   }
 
   .chart-section {
     flex: 8;
     height: 60vh;
   }
-
-  .alert-title {
-    font-size: 1em;
-  }
-
-  .alert-technique {
-    font-size: 0.9em;
-  }
-
-  .alert-content {
-    font-size: 0.9em;
-  }
 }
 
-/* 手機裝置（寬度小於 768px） */
+/* 手机装置（宽度小于 768px） */
 @media (max-width: 768px) {
   .content {
     flex-direction: column;
   }
 
-  .sidebar, .chart-section {
+  .sidebar,
+  .chart-section {
     flex: none;
     width: 100%;
     height: auto;
@@ -299,18 +110,6 @@ ul {
   .chart-section h2 {
     font-size: 1.2rem;
     margin-bottom: 15px;
-  }
-
-  .alert-title {
-    font-size: 1em;
-  }
-
-  .alert-technique {
-    font-size: 0.9em;
-  }
-
-  .alert-content {
-    font-size: 0.9em;
   }
 
   .matrix-container {
