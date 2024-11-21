@@ -26,10 +26,6 @@ function App() {
       .then((response) => response.json())
       .then((data) => {
         setLogs(data);
-
-        // 更新攻擊計數和高亮技術
-        updateAttackCounts(data);
-        updateHighlightedTechniques(data);
       })
       .catch((error) => {
         console.error('獲取日誌時出錯：', error);
@@ -59,14 +55,10 @@ function App() {
             );
 
             const newUniqueLogs = validLogs.filter(
-              (log) =>
-                !existingLogKeys.has(`${log.filePath}-${log.content}`)
+              (log) => !existingLogKeys.has(`${log.filePath}-${log.content}`)
             );
 
             if (newUniqueLogs.length > 0) {
-              updateAttackCounts(newUniqueLogs);
-              updateHighlightedTechniques(newUniqueLogs);
-
               // 根據時間戳排序，確保最新的在前
               newUniqueLogs.sort((a, b) => {
                 const timeA = new Date(
@@ -89,11 +81,9 @@ function App() {
           setLogs((prevLogs) =>
             prevLogs.filter(
               (log) =>
-                log.filePath !== data.filePath ||
-                log.content !== data.content
+                log.filePath !== data.filePath || log.content !== data.content
             )
           );
-          // 可選：根據需要更新攻擊計數和高亮技術
         } else {
           console.error('無效的刪除資料：', data);
         }
@@ -113,13 +103,19 @@ function App() {
     };
   }, []);
 
+  // 使用 useEffect 監聽 logs 狀態的變化，更新攻擊計數和高亮技術
+  useEffect(() => {
+    updateAttackCounts(logs);
+    updateHighlightedTechniques(logs);
+  }, [logs]);
+
   // 切換主題
   const toggleTheme = () => {
     setIsDarkMode((prevMode) => !prevMode);
   };
 
   // 更新攻擊計數
-  const updateAttackCounts = (logData) => {
+  const updateAttackCounts = (allLogs) => {
     const newCounts = {
       'Automated Collection': 0,
       'Spoof Reporting Message': 0,
@@ -127,7 +123,7 @@ function App() {
       'Denial of Service': 0,
     };
 
-    logData.forEach((log) => {
+    allLogs.forEach((log) => {
       if (log.content.includes('Automated Collection'))
         newCounts['Automated Collection']++;
       if (log.content.includes('Spoof Reporting Message'))
@@ -138,24 +134,14 @@ function App() {
         newCounts['Denial of Service']++;
     });
 
-    setAttackCounts((prevCounts) => ({
-      'Automated Collection':
-        prevCounts['Automated Collection'] + newCounts['Automated Collection'],
-      'Spoof Reporting Message':
-        prevCounts['Spoof Reporting Message'] +
-        newCounts['Spoof Reporting Message'],
-      'Brute Force IO':
-        prevCounts['Brute Force IO'] + newCounts['Brute Force IO'],
-      'Denial of Service':
-        prevCounts['Denial of Service'] + newCounts['Denial of Service'],
-    }));
+    setAttackCounts(newCounts);
   };
 
   // 更新高亮技術
-  const updateHighlightedTechniques = (logData) => {
+  const updateHighlightedTechniques = (allLogs) => {
     const triggeredTechniques = [];
 
-    logData.forEach((log) => {
+    allLogs.forEach((log) => {
       tactics.forEach((tactic) => {
         tactic.techniques.forEach((technique) => {
           if (log.content.includes(technique)) {
@@ -169,7 +155,7 @@ function App() {
     setHighlightedTechniques(uniqueTechniques);
   };
 
-  // 移除特定的 log
+  // 移除特定的日誌
   const removeLog = (log) => {
     setLogs((prevLogs) =>
       prevLogs.filter(
@@ -216,6 +202,7 @@ function App() {
 
         <div className="chart-section">
           <AttackMatrix highlightedTechniques={highlightedTechniques} />
+          {/* 如果需要顯示攻擊分析，可以取消註解以下組件 */}
           {/* <AttackAnalysis attackCounts={attackCounts} /> */}
         </div>
       </div>
